@@ -1,6 +1,6 @@
 {
   "name": "rustquant",
-  "description": "Build a personal website, blog, or portfolio with Astro.",
+  "description": "A modern Rust-powered framework for building high-frequency trading systems with performance, precision, and modular design.",
   "cloudflare": {
     "label": "Astro Framework Starter",
     "products": [
