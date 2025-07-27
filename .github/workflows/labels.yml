@@ -1,0 +1,13 @@
+name: Sync Labels
+
+on:
+  workflow_dispatch:
+
+jobs:
+  labels:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions-ecosystem/action-create-labels@v1
+        with:
+          config-file: .github/labels.yml
