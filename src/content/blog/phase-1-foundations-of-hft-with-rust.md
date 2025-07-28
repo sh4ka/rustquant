@@ -92,4 +92,4 @@ These practices will set the tone for a high-quality, professional Rust codebase
 
 ## What's Next?
 
-In the next article, we’ll begin exploring **market microstructure** in detail. We’ll analyze how modern exchanges operate, what kinds of orders are supported, and how latency influences execution strategies. Then we’ll link that knowledge to how we might model a feed handler and order book in Rust.
+In the next milestone article, we’ll begin exploring **market microstructure** in detail. We’ll analyze how modern exchanges operate, what kinds of orders are supported, and how latency influences execution strategies. Then we’ll link that knowledge to how we might model a feed handler and order book in Rust.
