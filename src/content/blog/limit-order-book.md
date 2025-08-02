@@ -250,4 +250,7 @@ While this Rust-based limit order book is functionally correct, in a high-freque
     - Memory-profiling with tools like perf, valgrind massif, and jemalloc statistics.
     - Multi-threaded scalability tests under synthetic workloads.
 
+# Code
+Full code example can be found at https://github.com/sh4ka/limit-order-book
+
 In the next article, we will explore advanced order types (iceberg, stop-loss) and extend our engine with event sourcing and persistence.
