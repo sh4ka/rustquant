@@ -1,0 +1,401 @@
+---
+interface Props {
+  currentSlug: string;
+  relatedArticles?: string[];
+  prerequisites?: string[];
+  mindmapBranch?: string;
+  allArticles: Array<{
+    slug: string;
+    data: {
+      title: string;
+      description: string;
+      mindmapBranch?: string;
+      concepts?: string[];
+      difficulty?: "beginner" | "intermediate" | "advanced";
+      tags?: string[];
+    };
+  }>;
+}
+
+const { currentSlug, relatedArticles = [], prerequisites = [], mindmapBranch, allArticles } = Astro.props;
+
+// Find articles by slug
+const findArticleBySlug = (slug: string) => allArticles.find(a => a.slug === slug);
+
+// Get explicitly related articles
+const explicitRelated = relatedArticles
+  .map(slug => findArticleBySlug(slug))
+  .filter(Boolean);
+
+// Get prerequisite articles
+const prereqArticles = prerequisites
+  .map(slug => findArticleBySlug(slug))
+  .filter(Boolean);
+
+// Get articles in the same branch (but not current article or already related)
+const sameBranchArticles = mindmapBranch 
+  ? allArticles
+      .filter(article => 
+        article.data.mindmapBranch === mindmapBranch &&
+        article.slug !== currentSlug &&
+        !relatedArticles.includes(article.slug) &&
+        !prerequisites.includes(article.slug)
+      )
+      .slice(0, 3) // Limit to 3
+  : [];
+
+// Get next level articles (articles that have current as prerequisite)
+const nextLevelArticles = allArticles
+  .filter(article => 
+    article.data.prerequisites?.includes(currentSlug) &&
+    article.slug !== currentSlug
+  )
+  .slice(0, 2);
+
+const difficultyColors = {
+  'beginner': '#10b981',
+  'intermediate': '#f59e0b', 
+  'advanced': '#ef4444'
+};
+
+const difficultyIcons = {
+  'beginner': '🟢',
+  'intermediate': '🟡',
+  'advanced': '🔴'
+};
+---
+
+<aside class="related-articles">
+  <!-- Prerequisites -->
+  {prereqArticles.length > 0 && (
+    <section class="related-section">
+      <h3 class="section-title">
+        📚 Prerequisites
+        <span class="section-subtitle">Read these first</span>
+      </h3>
+      <ul class="article-list">
+        {prereqArticles.map(article => (
+          <li class="article-item prerequisite">
+            <a href={`/blog/${article.slug}/`} class="article-link">
+              <div class="article-header">
+                <span class="article-title">{article.data.title}</span>
+                {article.data.difficulty && (
+                  <span 
+                    class="difficulty-badge" 
+                    style={`color: ${difficultyColors[article.data.difficulty]}`}
+                  >
+                    {difficultyIcons[article.data.difficulty]}
+                  </span>
+                )}
+              </div>
+              <p class="article-description">{article.data.description}</p>
+            </a>
+          </li>
+        ))}
+      </ul>
+    </section>
+  )}
+
+  <!-- Explicitly Related Articles -->
+  {explicitRelated.length > 0 && (
+    <section class="related-section">
+      <h3 class="section-title">
+        🔗 Related Topics  
+        <span class="section-subtitle">Dive deeper</span>
+      </h3>
+      <ul class="article-list">
+        {explicitRelated.map(article => (
+          <li class="article-item related">
+            <a href={`/blog/${article.slug}/`} class="article-link">
+              <div class="article-header">
+                <span class="article-title">{article.data.title}</span>
+                {article.data.difficulty && (
+                  <span 
+                    class="difficulty-badge" 
+                    style={`color: ${difficultyColors[article.data.difficulty]}`}
+                  >
+                    {difficultyIcons[article.data.difficulty]}
+                  </span>
+                )}
+              </div>
+              <p class="article-description">{article.data.description}</p>
+            </a>
+          </li>
+        ))}
+      </ul>
+    </section>
+  )}
+
+  <!-- Same Branch Articles -->
+  {sameBranchArticles.length > 0 && (
+    <section class="related-section">
+      <h3 class="section-title">
+        🏗️ More in {mindmapBranch}
+        <span class="section-subtitle">Explore this branch</span>
+      </h3>
+      <ul class="article-list">
+        {sameBranchArticles.map(article => (
+          <li class="article-item same-branch">
+            <a href={`/blog/${article.slug}/`} class="article-link">
+              <div class="article-header">
+                <span class="article-title">{article.data.title}</span>
+                {article.data.difficulty && (
+                  <span 
+                    class="difficulty-badge" 
+                    style={`color: ${difficultyColors[article.data.difficulty]}`}
+                  >
+                    {difficultyIcons[article.data.difficulty]}
+                  </span>
+                )}
+              </div>
+              <p class="article-description">{article.data.description}</p>
+            </a>
+          </li>
+        ))}
+      </ul>
+    </section>
+  )}
+
+  <!-- Next Level Articles -->
+  {nextLevelArticles.length > 0 && (
+    <section class="related-section">
+      <h3 class="section-title">
+        ⬆️ Next Steps
+        <span class="section-subtitle">Continue learning</span>
+      </h3>
+      <ul class="article-list">
+        {nextLevelArticles.map(article => (
+          <li class="article-item next-level">
+            <a href={`/blog/${article.slug}/`} class="article-link">
+              <div class="article-header">
+                <span class="article-title">{article.data.title}</span>
+                {article.data.difficulty && (
+                  <span 
+                    class="difficulty-badge" 
+                    style={`color: ${difficultyColors[article.data.difficulty]}`}
+                  >
+                    {difficultyIcons[article.data.difficulty]}
+                  </span>
+                )}
+              </div>
+              <p class="article-description">{article.data.description}</p>
+            </a>
+          </li>
+        ))}
+      </ul>
+    </section>
+  )}
+
+  <!-- Mindmap Navigation -->
+  <section class="related-section mindmap-section">
+    <h3 class="section-title">
+      🗺️ Knowledge Graph
+      <span class="section-subtitle">Visual exploration</span>
+    </h3>
+    <div class="mindmap-actions">
+      <a href="/blog/mindmap/" class="mindmap-link">
+        View Full Mindmap
+      </a>
+      <button class="toggle-mini-graph" onclick="toggleMiniGraph()">
+        Show Mini Graph
+      </button>
+    </div>
+    <div id="mini-graph" class="mini-graph" style="display: none;">
+      <!-- Mini graph will be inserted here -->
+    </div>
+  </section>
+</aside>
+
+<style>
+  .related-articles {
+    background: #fafbfc;
+    border: 1px solid #e1e5e9;
+    border-radius: 12px;
+    padding: 20px;
+    max-width: 300px;
+    position: sticky;
+    top: 20px;
+  }
+
+  .related-section {
+    margin-bottom: 24px;
+  }
+
+  .related-section:last-child {
+    margin-bottom: 0;
+  }
+
+  .section-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: #1e293b;
+    margin: 0 0 12px 0;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .section-subtitle {
+    font-size: 12px;
+    font-weight: 400;
+    color: #64748b;
+  }
+
+  .article-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .article-item {
+    margin-bottom: 12px;
+  }
+
+  .article-item:last-child {
+    margin-bottom: 0;
+  }
+
+  .article-link {
+    display: block;
+    padding: 12px;
+    background: white;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    text-decoration: none;
+    transition: all 0.2s ease;
+  }
+
+  .article-link:hover {
+    border-color: #3b82f6;
+    box-shadow: 0 2px 4px rgba(59, 130, 246, 0.1);
+    transform: translateY(-1px);
+  }
+
+  .article-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 4px;
+    gap: 8px;
+  }
+
+  .article-title {
+    font-weight: 500;
+    font-size: 13px;
+    color: #1e293b;
+    line-height: 1.4;
+    flex: 1;
+  }
+
+  .difficulty-badge {
+    font-size: 12px;
+    flex-shrink: 0;
+  }
+
+  .article-description {
+    font-size: 11px;
+    color: #64748b;
+    line-height: 1.4;
+    margin: 0;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  /* Special styling for different relationship types */
+  .prerequisite .article-link {
+    border-left: 3px solid #ef4444;
+    background: linear-gradient(90deg, #fef2f2, white);
+  }
+
+  .related .article-link {
+    border-left: 3px solid #3b82f6;
+    background: linear-gradient(90deg, #eff6ff, white);
+  }
+
+  .same-branch .article-link {
+    border-left: 3px solid #10b981;
+    background: linear-gradient(90deg, #f0fdf4, white);
+  }
+
+  .next-level .article-link {
+    border-left: 3px solid #f59e0b;
+    background: linear-gradient(90deg, #fffbeb, white);
+  }
+
+  .mindmap-section {
+    border-top: 2px solid #e2e8f0;
+    padding-top: 16px;
+  }
+
+  .mindmap-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .mindmap-link,
+  .toggle-mini-graph {
+    padding: 8px 12px;
+    border-radius: 6px;
+    text-align: center;
+    font-size: 12px;
+    font-weight: 500;
+    transition: all 0.2s ease;
+  }
+
+  .mindmap-link {
+    background: #3b82f6;
+    color: white;
+    text-decoration: none;
+  }
+
+  .mindmap-link:hover {
+    background: #2563eb;
+    transform: translateY(-1px);
+  }
+
+  .toggle-mini-graph {
+    background: #f1f5f9;
+    color: #475569;
+    border: 1px solid #e2e8f0;
+    cursor: pointer;
+  }
+
+  .toggle-mini-graph:hover {
+    background: #e2e8f0;
+  }
+
+  .mini-graph {
+    margin-top: 12px;
+    height: 200px;
+    border: 1px solid #e2e8f0;
+    border-radius: 6px;
+    background: white;
+  }
+
+  @media (max-width: 1024px) {
+    .related-articles {
+      position: relative;
+      max-width: none;
+      margin-top: 24px;
+    }
+  }
+</style>
+
+<script>
+  function toggleMiniGraph() {
+    const miniGraph = document.getElementById('mini-graph');
+    const button = document.querySelector('.toggle-mini-graph');
+    
+    if (miniGraph.style.display === 'none') {
+      miniGraph.style.display = 'block';
+      button.textContent = 'Hide Mini Graph';
+      // Here you could load a smaller version of the mindmap
+    } else {
+      miniGraph.style.display = 'none';
+      button.textContent = 'Show Mini Graph';
+    }
+  }
+</script>

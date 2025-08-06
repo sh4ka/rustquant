@@ -1,0 +1,197 @@
+---
+interface Props {
+  mindmapBranch?: string;
+  title: string;
+  concepts?: string[];
+}
+
+const { mindmapBranch, title, concepts = [] } = Astro.props;
+
+// Define branch hierarchy
+const branchHierarchy = {
+  'Architecture': {
+    icon: '🏗️',
+    parent: 'HFT Framework',
+    description: 'System design and structure'
+  },
+  'Performance': {
+    icon: '⚡',
+    parent: 'HFT Framework', 
+    description: 'Latency and throughput optimization'
+  },
+  'Components': {
+    icon: '🔧',
+    parent: 'HFT Framework',
+    description: 'Core trading system components'
+  },
+  'Foundations': {
+    icon: '🏛️',
+    parent: 'HFT Framework',
+    description: 'Fundamental concepts and setup'
+  }
+};
+
+const currentBranch = mindmapBranch && branchHierarchy[mindmapBranch] 
+  ? branchHierarchy[mindmapBranch] 
+  : null;
+---
+
+<nav class="breadcrumb-nav" aria-label="Breadcrumb">
+  <ol class="breadcrumb-list">
+    <!-- Root -->
+    <li class="breadcrumb-item">
+      <a href="/" class="breadcrumb-link">
+        🏠 Home
+      </a>
+      <span class="breadcrumb-separator">/</span>
+    </li>
+    
+    <!-- Blog Section -->
+    <li class="breadcrumb-item">
+      <a href="/blog/" class="breadcrumb-link">
+        📚 Blog  
+      </a>
+      <span class="breadcrumb-separator">/</span>
+    </li>
+
+    <!-- HFT Framework Root -->
+    <li class="breadcrumb-item">
+      <a href="/blog/" class="breadcrumb-link">
+        ⚡ HFT Framework
+      </a>
+      {currentBranch && <span class="breadcrumb-separator">/</span>}
+    </li>
+
+    <!-- Branch Level -->
+    {currentBranch && (
+      <li class="breadcrumb-item">
+        <a href={`/blog/?branch=${mindmapBranch?.toLowerCase()}`} class="breadcrumb-link branch-link">
+          {currentBranch.icon} {mindmapBranch}
+        </a>
+        <span class="breadcrumb-separator">/</span>
+      </li>
+    )}
+
+    <!-- Current Article -->
+    <li class="breadcrumb-item current" aria-current="page">
+      <span class="breadcrumb-current">
+        📖 {title}
+      </span>
+    </li>
+  </ol>
+
+  <!-- Concepts Tags -->
+  {concepts.length > 0 && (
+    <div class="concept-tags">
+      <span class="concepts-label">Related concepts:</span>
+      {concepts.map(concept => (
+        <span class="concept-tag">{concept}</span>
+      ))}
+    </div>
+  )}
+</nav>
+
+<style>
+  .breadcrumb-nav {
+    background: linear-gradient(90deg, #f8fafc 0%, #e2e8f0 100%);
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 12px 16px;
+    margin-bottom: 24px;
+    font-size: 14px;
+  }
+
+  .breadcrumb-list {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    gap: 4px;
+  }
+
+  .breadcrumb-item {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .breadcrumb-link {
+    color: #3b82f6;
+    text-decoration: none;
+    padding: 4px 8px;
+    border-radius: 4px;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .breadcrumb-link:hover {
+    background: #e0f2fe;
+    text-decoration: underline;
+  }
+
+  .branch-link {
+    background: rgba(59, 130, 246, 0.1);
+    font-weight: 500;
+  }
+
+  .breadcrumb-separator {
+    color: #64748b;
+    margin: 0 4px;
+    font-weight: normal;
+  }
+
+  .breadcrumb-current {
+    color: #1e293b;
+    font-weight: 600;
+    padding: 4px 8px;
+    background: rgba(15, 23, 42, 0.1);
+    border-radius: 4px;
+  }
+
+  .concept-tags {
+    margin-top: 8px;
+    padding-top: 8px;
+    border-top: 1px solid #e2e8f0;
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .concepts-label {
+    font-size: 12px;
+    color: #64748b;
+    font-weight: 500;
+  }
+
+  .concept-tag {
+    background: #f1f5f9;
+    color: #475569;
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 11px;
+    font-weight: 500;
+    border: 1px solid #e2e8f0;
+  }
+
+  @media (max-width: 640px) {
+    .breadcrumb-nav {
+      font-size: 12px;
+      padding: 8px 12px;
+    }
+    
+    .breadcrumb-list {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 2px;
+    }
+    
+    .breadcrumb-item {
+      margin-bottom: 2px;
+    }
+  }
+</style>

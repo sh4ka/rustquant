@@ -1,0 +1,19 @@
+labels:
+  - name: bug
+    color: 'ff0000'
+    description: Something isn't working
+  - name: enhancement
+    color: 'a2eeef'
+    description: New feature or request
+  - name: improvement
+    color: 'c2e0c6'
+    description: Enhancement to existing functionality or docs
+  - name: documentation
+    color: '0075ca'
+    description: Documentation related work
+  - name: hft
+    color: '5319e7'
+    description: Core high-frequency trading code
+  - name: blog-comment
+    color: '73caff'
+    description: Comment for any article in the blog section

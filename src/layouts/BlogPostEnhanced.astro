@@ -1,0 +1,243 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import { getCollection } from 'astro:content';
+import BaseHead from '../components/BaseHead.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import FormattedDate from '../components/FormattedDate.astro';
+import Breadcrumbs from '../components/Breadcrumbs.astro';
+import RelatedArticles from '../components/RelatedArticles.astro';
+
+type Props = CollectionEntry<'blog'>['data'] & {
+  slug: string;
+};
+
+const { 
+  title, 
+  description, 
+  pubDate, 
+  updatedDate, 
+  heroImage,
+  mindmapBranch,
+  concepts,
+  relatedArticles,
+  prerequisites,
+  difficulty,
+  tags,
+  slug
+} = Astro.props;
+
+// Get all blog articles for related article suggestions
+const allBlogArticles = await getCollection('blog');
+---
+
+<html lang="en">
+	<head>
+		<BaseHead title={title} description={description} />
+		<style>
+			main {
+				width: calc(100% - 2em);
+				max-width: 100%;
+				margin: 0;
+				display: grid;
+				grid-template-columns: 1fr;
+				gap: 2em;
+			}
+
+			@media (min-width: 1024px) {
+				main {
+					grid-template-columns: 1fr 320px;
+					max-width: 1200px;
+					margin: 0 auto;
+				}
+			}
+
+			.article-content {
+				min-width: 0; /* Prevent overflow */
+			}
+
+			.hero-image {
+				width: 100%;
+			}
+			.hero-image img {
+				display: block;
+				margin: 0 auto;
+				border-radius: 12px;
+				box-shadow: var(--box-shadow);
+			}
+			.prose {
+				max-width: calc(100% - 2em);
+				margin: auto;
+				padding: 1em;
+				color: rgb(var(--gray-dark));
+			}
+			.title {
+				margin-bottom: 1em;
+				padding: 1em 0;
+				text-align: center;
+				line-height: 1;
+			}
+			.title h1 {
+				margin: 0 0 0.5em 0;
+			}
+			.date {
+				margin-bottom: 0.5em;
+				color: rgb(var(--gray));
+			}
+			.last-updated-on {
+				font-style: italic;
+			}
+
+			.article-meta {
+				display: flex;
+				flex-wrap: wrap;
+				gap: 12px;
+				align-items: center;
+				justify-content: center;
+				margin: 16px 0;
+				padding: 12px;
+				background: #f8fafc;
+				border-radius: 8px;
+				font-size: 14px;
+			}
+
+			.meta-item {
+				display: flex;
+				align-items: center;
+				gap: 4px;
+				padding: 4px 8px;
+				background: white;
+				border: 1px solid #e2e8f0;
+				border-radius: 6px;
+			}
+
+			.difficulty-beginner { border-left: 3px solid #10b981; }
+			.difficulty-intermediate { border-left: 3px solid #f59e0b; }
+			.difficulty-advanced { border-left: 3px solid #ef4444; }
+
+			.tags-container {
+				display: flex;
+				flex-wrap: wrap;
+				gap: 6px;
+				justify-content: center;
+				margin: 12px 0;
+			}
+
+			.tag {
+				background: #e0f2fe;
+				color: #0369a1;
+				padding: 2px 8px;
+				border-radius: 12px;
+				font-size: 12px;
+				font-weight: 500;
+				border: 1px solid #bae6fd;
+			}
+
+			.sidebar {
+				/* Sidebar styles handled by RelatedArticles component */
+			}
+
+			@media (max-width: 1024px) {
+				.sidebar {
+					order: -1; /* Move sidebar above content on mobile */
+				}
+			}
+		</style>
+	</head>
+
+	<body>
+		<Header />
+		<main>
+			<div class="article-content">
+				<article>
+					<!-- Breadcrumb Navigation -->
+					<Breadcrumbs 
+						mindmapBranch={mindmapBranch}
+						title={title}
+						concepts={concepts}
+					/>
+
+					<!-- Hero Image -->
+					<div class="hero-image">
+						{heroImage && <img width={1020} height={510} src={heroImage} alt="" />}
+					</div>
+
+					<div class="prose">
+						<div class="title">
+							<div class="date">
+								<FormattedDate date={pubDate} />
+								{
+									updatedDate && (
+										<div class="last-updated-on">
+											Last updated on <FormattedDate date={updatedDate} />
+										</div>
+									)
+								}
+							</div>
+							<h1>{title}</h1>
+
+							<!-- Article Metadata -->
+							{(difficulty || mindmapBranch) && (
+								<div class="article-meta">
+									{difficulty && (
+										<div class={`meta-item difficulty-${difficulty}`}>
+											<span>
+												{difficulty === 'beginner' && '🟢'}
+												{difficulty === 'intermediate' && '🟡'}  
+												{difficulty === 'advanced' && '🔴'}
+											</span>
+											<span>{difficulty}</span>
+										</div>
+									)}
+									{mindmapBranch && (
+										<div class="meta-item">
+											<span>🏗️</span>
+											<span>{mindmapBranch}</span>
+										</div>
+									)}
+								</div>
+							)}
+
+							<!-- Tags -->
+							{tags && tags.length > 0 && (
+								<div class="tags-container">
+									{tags.map(tag => (
+										<span class="tag">{tag}</span>
+									))}
+								</div>
+							)}
+
+							<hr />
+						</div>
+
+						<!-- Article Content -->
+						<slot />
+					</div>
+				</article>
+
+				<!-- Comments -->
+				<script src="https://utteranc.es/client.js"
+					repo="sh4ka/rustquant"
+					issue-term="url"
+					label="blog-comment"
+					theme="github-light"
+					crossorigin="anonymous"
+					async>
+				</script>
+			</div>
+
+			<!-- Sidebar with Related Articles -->
+			<div class="sidebar">
+				<RelatedArticles 
+					currentSlug={slug}
+					relatedArticles={relatedArticles}
+					prerequisites={prerequisites}
+					mindmapBranch={mindmapBranch}
+					allArticles={allBlogArticles}
+				/>
+			</div>
+		</main>
+		
+		<Footer />
+	</body>
+</html>

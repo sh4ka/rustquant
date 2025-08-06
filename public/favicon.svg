@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 128 128">
+    <circle cx="64" cy="64" r="60" fill="#000" stroke="#ccc" stroke-width="4"/>
+    <g transform="translate(64,64)">
+        <g transform="scale(0.85)">
+            <path d="M40 0 L50 15 L40 30 L45 40 L30 40 L20 50 L10 40 L-10 40 L-20 50 L-30 40 L-45 40 L-40 30 L-50 15 L-40 0 L-50 -15 L-40 -30 L-45 -40 L-30 -40 L-20 -50 L-10 -40 L10 -40 L20 -50 L30 -40 L45 -40 L40 -30 L50 -15 Z" fill="#444"/>
+        </g>
+    </g>
+    <text x="64" y="80" font-size="48" text-anchor="middle" fill="#fff" font-family="monospace" font-weight="bold">R</text>
+</svg>

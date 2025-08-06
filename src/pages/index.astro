@@ -1,0 +1,40 @@
+---
+import BaseHead from '../components/BaseHead.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import { SITE_TITLE, SITE_DESCRIPTION } from '../consts';
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <BaseHead title={SITE_TITLE} description={SITE_DESCRIPTION} />
+  </head>
+  <body>
+    <Header />
+    <main>
+      <h1>Welcome to {SITE_TITLE}</h1>
+      <p>
+        This site is built with <a href="https://astro.build/" target="_blank">Astro</a>, a modern framework for building fast, content-focused websites.
+      </p>
+      <p>
+        Whether you're here for technical deep-dives, architecture discussions, or professional updates, you're in the right place.
+      </p>
+      <p>What you’ll find here:</p>
+      <ul>
+        <li>Well-structured articles covering software engineering, systems design, and development tools</li>
+        <li>Project updates and open source contributions</li>
+        <li>Learning resources and curated recommendations</li>
+      </ul>
+      <p>
+        The layout is minimal by design, allowing the content to take center stage. As the project evolves, so will this site.
+      </p>
+      <p>
+        If you're building with Astro too, consider exploring the official
+        <a href="https://docs.astro.build/" target="_blank">documentation</a> or visiting the <a href="https://astro.build/chat" target="_blank">community Discord</a>.
+      </p>
+    </main>
+    <Footer />
+  </body>
+</html>
+

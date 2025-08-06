@@ -1,0 +1,346 @@
+---
+import { getCollection } from 'astro:content';
+import BaseHead from '../../components/BaseHead.astro';
+import Header from '../../components/Header.astro';
+import Footer from '../../components/Footer.astro';
+import MindmapGraph from '../../components/MindmapGraph.astro';
+
+const allBlogPosts = await getCollection('blog');
+
+// Sort by publication date
+const sortedPosts = allBlogPosts.sort(
+  (a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf(),
+);
+
+const title = 'Knowledge Graph - HFT Framework Mindmap';
+const description = 'Interactive visualization of all articles and their relationships in the HFT framework documentation.';
+---
+
+<html lang="en">
+	<head>
+		<BaseHead title={title} description={description} />
+		<style>
+			main {
+				width: calc(100% - 2em);
+				max-width: 1200px;
+				margin: 0 auto;
+				padding: 1em;
+			}
+
+			.mindmap-header {
+				text-align: center;
+				margin-bottom: 2em;
+			}
+
+			.mindmap-header h1 {
+				margin: 0 0 0.5em 0;
+				color: rgb(var(--gray-dark));
+			}
+
+			.mindmap-header p {
+				color: rgb(var(--gray));
+				font-size: 1.1em;
+				max-width: 600px;
+				margin: 0 auto 1em auto;
+				line-height: 1.6;
+			}
+
+			.mindmap-container {
+				background: white;
+				border-radius: 12px;
+				box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+				padding: 20px;
+				margin-bottom: 2em;
+			}
+
+			.mindmap-controls {
+				display: flex;
+				justify-content: center;
+				gap: 12px;
+				margin-bottom: 20px;
+				flex-wrap: wrap;
+			}
+
+			.control-button {
+				padding: 8px 16px;
+				border: 1px solid #e2e8f0;
+				background: white;
+				border-radius: 6px;
+				cursor: pointer;
+				font-size: 14px;
+				transition: all 0.2s ease;
+			}
+
+			.control-button:hover {
+				background: #f1f5f9;
+				border-color: #3b82f6;
+			}
+
+			.control-button.active {
+				background: #3b82f6;
+				color: white;
+				border-color: #3b82f6;
+			}
+
+			.mindmap-legend {
+				display: flex;
+				justify-content: center;
+				gap: 20px;
+				margin-top: 16px;
+				flex-wrap: wrap;
+				font-size: 14px;
+			}
+
+			.legend-item {
+				display: flex;
+				align-items: center;
+				gap: 6px;
+			}
+
+			.legend-color {
+				width: 16px;
+				height: 16px;
+				border-radius: 50%;
+				border: 2px solid white;
+			}
+
+			.legend-architecture { background: #3b82f6; }
+			.legend-performance { background: #ef4444; }
+			.legend-components { background: #10b981; }
+			.legend-foundations { background: #f59e0b; }
+
+			.stats-section {
+				display: grid;
+				grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+				gap: 20px;
+				margin: 2em 0;
+			}
+
+			.stat-card {
+				background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+				color: white;
+				padding: 20px;
+				border-radius: 12px;
+				text-align: center;
+			}
+
+			.stat-card h3 {
+				margin: 0 0 8px 0;
+				font-size: 2em;
+				font-weight: bold;
+			}
+
+			.stat-card p {
+				margin: 0;
+				opacity: 0.9;
+			}
+
+			.article-list-section {
+				margin-top: 3em;
+			}
+
+			.branch-section {
+				margin-bottom: 2em;
+			}
+
+			.branch-title {
+				font-size: 1.5em;
+				font-weight: 600;
+				margin-bottom: 1em;
+				padding-bottom: 0.5em;
+				border-bottom: 2px solid #e2e8f0;
+				display: flex;
+				align-items: center;
+				gap: 8px;
+			}
+
+			.article-grid {
+				display: grid;
+				grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+				gap: 16px;
+			}
+
+			.article-card {
+				background: white;
+				border: 1px solid #e2e8f0;
+				border-radius: 8px;
+				padding: 16px;
+				transition: all 0.2s ease;
+			}
+
+			.article-card:hover {
+				border-color: #3b82f6;
+				box-shadow: 0 2px 4px rgba(59, 130, 246, 0.1);
+				transform: translateY(-2px);
+			}
+
+			.article-card h4 {
+				margin: 0 0 8px 0;
+				font-size: 1.1em;
+			}
+
+			.article-card h4 a {
+				text-decoration: none;
+				color: rgb(var(--gray-dark));
+			}
+
+			.article-card h4 a:hover {
+				color: #3b82f6;
+			}
+
+			.article-card p {
+				margin: 0;
+				font-size: 0.9em;
+				color: rgb(var(--gray));
+				line-height: 1.5;
+			}
+
+			@media (max-width: 768px) {
+				.mindmap-controls {
+					flex-direction: column;
+					align-items: center;
+				}
+
+				.mindmap-legend {
+					flex-direction: column;
+					align-items: center;
+					gap: 12px;
+				}
+			}
+		</style>
+	</head>
+
+	<body>
+		<Header />
+		<main>
+			<div class="mindmap-header">
+				<h1>🗺️ HFT Framework Knowledge Graph</h1>
+				<p>
+					Explore the interconnected concepts, articles, and learning paths 
+					in our high-frequency trading framework documentation. Click on nodes 
+					to navigate, drag to explore, and discover relationships between topics.
+				</p>
+			</div>
+
+			<!-- Statistics -->
+			<div class="stats-section">
+				<div class="stat-card">
+					<h3>{allBlogPosts.length}</h3>
+					<p>Total Articles</p>
+				</div>
+				<div class="stat-card">
+					<h3>{allBlogPosts.filter(post => post.data.mindmapBranch === 'Architecture').length}</h3>
+					<p>Architecture Topics</p>
+				</div>
+				<div class="stat-card">
+					<h3>{allBlogPosts.filter(post => post.data.mindmapBranch === 'Performance').length}</h3>
+					<p>Performance Topics</p>
+				</div>
+				<div class="stat-card">
+					<h3>{allBlogPosts.filter(post => post.data.mindmapBranch === 'Components').length}</h3>
+					<p>Component Topics</p>
+				</div>
+			</div>
+
+			<!-- Interactive Mindmap -->
+			<div class="mindmap-container">
+				<div class="mindmap-controls">
+					<button class="control-button active" onclick="filterBranch('all')">All Topics</button>
+					<button class="control-button" onclick="filterBranch('architecture')">🏗️ Architecture</button>
+					<button class="control-button" onclick="filterBranch('performance')">⚡ Performance</button>
+					<button class="control-button" onclick="filterBranch('components')">🔧 Components</button>
+					<button class="control-button" onclick="filterBranch('foundations')">🏛️ Foundations</button>
+					<button class="control-button" onclick="resetGraph()">Reset View</button>
+				</div>
+
+				<MindmapGraph 
+					articles={sortedPosts}
+					width={1000}
+					height={600}
+				/>
+
+				<div class="mindmap-legend">
+					<div class="legend-item">
+						<div class="legend-color legend-architecture"></div>
+						<span>Architecture</span>
+					</div>
+					<div class="legend-item">
+						<div class="legend-color legend-performance"></div>
+						<span>Performance</span>
+					</div>
+					<div class="legend-item">
+						<div class="legend-color legend-components"></div>
+						<span>Components</span>
+					</div>
+					<div class="legend-item">
+						<div class="legend-color legend-foundations"></div>
+						<span>Foundations</span>
+					</div>
+				</div>
+			</div>
+
+			<!-- Article Listings by Branch -->
+			<div class="article-list-section">
+				{['Architecture', 'Performance', 'Components', 'Foundations'].map(branch => {
+					const branchArticles = sortedPosts.filter(post => 
+						post.data.mindmapBranch === branch || 
+						(branch === 'Foundations' && !post.data.mindmapBranch)
+					);
+					
+					if (branchArticles.length === 0) return null;
+
+					const branchIcons = {
+						'Architecture': '🏗️',
+						'Performance': '⚡',
+						'Components': '🔧',
+						'Foundations': '🏛️'
+					};
+
+					return (
+						<div class="branch-section">
+							<h2 class="branch-title">
+								{branchIcons[branch]} {branch}
+								<span style="font-size: 0.7em; font-weight: normal; color: rgb(var(--gray));">
+									({branchArticles.length} articles)
+								</span>
+							</h2>
+							<div class="article-grid">
+								{branchArticles.map(post => (
+									<div class="article-card">
+										<h4>
+											<a href={`/blog/${post.slug}/`}>
+												{post.data.title}
+											</a>
+										</h4>
+										<p>{post.data.description}</p>
+									</div>
+								))}
+							</div>
+						</div>
+					);
+				})}
+			</div>
+		</main>
+
+		<script>
+			// Graph filtering functions (these would interact with the MindmapGraph component)
+			function filterBranch(branch) {
+				// Update active button
+				document.querySelectorAll('.control-button').forEach(btn => {
+					btn.classList.remove('active');
+				});
+				event.target.classList.add('active');
+
+				// Here you would filter the graph visualization
+				console.log('Filtering by branch:', branch);
+			}
+
+			function resetGraph() {
+				// Reset graph to original state
+				console.log('Resetting graph view');
+			}
+		</script>
+
+		<Footer />
+	</body>
+</html>
