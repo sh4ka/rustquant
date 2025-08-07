@@ -96,13 +96,15 @@ const graphId = `mindmap-${Math.random().toString(36).substr(2, 9)}`;
   :global(.tooltip) {
     position: absolute;
     padding: 8px 12px;
-    background: rgba(0, 0, 0, 0.8);
+    background: rgba(0, 0, 0, 0.9);
     color: white;
-    border-radius: 4px;
+    border-radius: 6px;
     font-size: 12px;
     pointer-events: none;
     z-index: 1000;
     max-width: 200px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+    line-height: 1.4;
   }
 </style>
 
@@ -119,6 +121,12 @@ const graphId = `mindmap-${Math.random().toString(36).substr(2, 9)}`;
   
   // Start initialization
   initializeMindmap();
+
+  // Global variables for filtering
+  let currentSimulation = null;
+  let currentNodes = null;
+  let currentLinks = null;
+  let currentSvg = null;
 
   function createMindmapGraph(d3) {
     const container = document.getElementById(graphId);
@@ -195,12 +203,31 @@ const graphId = `mindmap-${Math.random().toString(36).substr(2, 9)}`;
       .attr('class', 'tooltip')
       .style('opacity', 0);
 
-    // Create force simulation
+    // Store references for filtering
+    currentNodes = nodes;
+    currentLinks = links;
+    currentSvg = svg;
+
+    // Create force simulation but stop it immediately after initial positioning
     const simulation = d3.forceSimulation(nodes)
-      .force('link', d3.forceLink(links).id(d => d.id).distance(100))
-      .force('charge', d3.forceManyBody().strength(-300))
+      .force('link', d3.forceLink(links).id(d => d.id).distance(80).strength(0.5))
+      .force('charge', d3.forceManyBody().strength(-200))
       .force('center', d3.forceCenter(width / 2, height / 2))
-      .force('collision', d3.forceCollide().radius(35));
+      .force('collision', d3.forceCollide().radius(30).strength(0.8))
+      .alphaDecay(0.1) // Fast settling
+      .velocityDecay(0.8); // High damping
+    
+    currentSimulation = simulation;
+
+    // Stop simulation after initial layout (about 1 second)
+    setTimeout(() => {
+      simulation.stop();
+      // Fix all nodes in their current positions
+      nodes.forEach(node => {
+        node.fx = node.x;
+        node.fy = node.y;
+      });
+    }, 1000);
 
     // Create links
     const link = svg.append('g')
@@ -231,25 +258,31 @@ const graphId = `mindmap-${Math.random().toString(36).substr(2, 9)}`;
       .attr('dy', 30)
       .style('font-size', '10px');
 
-    // Add interactivity
-    node
-      .on('mouseover', (event, d) => {
-        tooltip.transition().duration(200).style('opacity', 0.9);
-        tooltip.html(`
-          <strong>${d.title}</strong><br/>
-          Branch: ${d.branch}<br/>
-          Difficulty: ${d.difficulty}<br/>
-          Concepts: ${d.concepts.join(', ') || 'None'}
-        `)
-        .style('left', (event.pageX + 10) + 'px')
-        .style('top', (event.pageY - 28) + 'px');
-      })
-      .on('mouseout', () => {
-        tooltip.transition().duration(500).style('opacity', 0);
-      })
-      .on('click', (event, d) => {
-        window.location.href = d.url;
-      });
+    // Add interactivity after layout is complete
+    setTimeout(() => {
+      node
+        .on('mouseover', (event, d) => {
+          // Get the container's bounding rectangle for proper positioning
+          const containerRect = container.getBoundingClientRect();
+          
+          tooltip.transition().duration(200).style('opacity', 0.9);
+          tooltip.html(`
+            <strong>${d.title}</strong><br/>
+            Branch: ${d.branch}<br/>
+            Difficulty: ${d.difficulty}<br/>
+            Concepts: ${d.concepts.join(', ') || 'None'}
+          `)
+          // Position tooltip relative to the node position
+          .style('left', (containerRect.left + d.x + 40) + 'px')
+          .style('top', (containerRect.top + d.y - 20) + 'px');
+        })
+        .on('mouseout', (event, d) => {
+          tooltip.transition().duration(500).style('opacity', 0);
+        })
+        .on('click', (event, d) => {
+          window.location.href = d.url;
+        });
+    }, 1500); // Add interaction after simulation is stopped
 
     // Update positions on simulation tick
     simulation.on('tick', () => {
@@ -280,4 +313,69 @@ const graphId = `mindmap-${Math.random().toString(36).substr(2, 9)}`;
       event.subject.fy = null;
     }
   }
+
+  // Filtering functions
+  window.filterBranch = function(branch) {
+    if (!currentSvg || !currentNodes) return;
+
+    // Update active button
+    document.querySelectorAll('.control-button').forEach(btn => {
+      btn.classList.remove('active');
+    });
+    event.target.classList.add('active');
+
+    // Filter nodes and links based on branch
+    const filteredNodes = branch === 'all' 
+      ? currentNodes 
+      : currentNodes.filter(node => node.branch.toLowerCase() === branch.toLowerCase());
+    
+    const filteredNodeIds = new Set(filteredNodes.map(n => n.id));
+    const filteredLinks = currentLinks.filter(link => 
+      filteredNodeIds.has(link.source.id || link.source) && 
+      filteredNodeIds.has(link.target.id || link.target)
+    );
+
+    // Update visualization
+    const nodeSelection = currentSvg.selectAll('.node').data(filteredNodes, d => d.id);
+    const linkSelection = currentSvg.selectAll('.link').data(filteredLinks);
+
+    // Hide/show nodes
+    currentSvg.selectAll('.node').style('opacity', d => 
+      filteredNodeIds.has(d.id) ? 1 : 0.1
+    );
+
+    // Hide/show links
+    currentSvg.selectAll('.link').style('opacity', d => 
+      filteredNodeIds.has(d.source.id || d.source) && 
+      filteredNodeIds.has(d.target.id || d.target) ? 0.6 : 0.1
+    );
+
+    // Restart simulation with filtered nodes
+    if (currentSimulation) {
+      currentSimulation.nodes(filteredNodes);
+      currentSimulation.force('link').links(filteredLinks);
+      currentSimulation.alpha(0.3).restart();
+    }
+  };
+
+  window.resetGraph = function() {
+    if (!currentSvg || !currentNodes) return;
+
+    // Reset all nodes and links to visible
+    currentSvg.selectAll('.node').style('opacity', 1);
+    currentSvg.selectAll('.link').style('opacity', 0.6);
+
+    // Restart simulation with all nodes
+    if (currentSimulation) {
+      currentSimulation.nodes(currentNodes);
+      currentSimulation.force('link').links(currentLinks);
+      currentSimulation.alpha(0.3).restart();
+    }
+
+    // Reset active button
+    document.querySelectorAll('.control-button').forEach(btn => {
+      btn.classList.remove('active');
+    });
+    document.querySelector('.control-button').classList.add('active');
+  };
 </script>

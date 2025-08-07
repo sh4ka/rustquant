@@ -2,6 +2,12 @@
 title: "Roadmap: building a trading framework in Rust"
 description: "Roadmap for project completion"
 pubDate: "Jul 27 2025"
+mindmapBranch: "Foundations"
+difficulty: "beginner"
+concepts: ["Project Roadmap", "Development Phases", "Planning"]
+tags: ["rust", "hft", "roadmap", "project-management"]
+prerequisites: ["0-initial-plan"]
+seriesOrder: 2
 ---
 
 # Roadmap: building a trading framework in Rust

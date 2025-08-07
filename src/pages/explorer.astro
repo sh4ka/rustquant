@@ -1,0 +1,632 @@
+---
+import { getCollection } from 'astro:content';
+import BaseHead from '../components/BaseHead.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+
+const allBlogPosts = await getCollection('blog');
+const allResourcePosts = await getCollection('resources');
+
+// Combine both collections and add a type field for proper routing
+const allPosts = [
+  ...allBlogPosts.map(post => ({ ...post, type: 'blog' })),
+  ...allResourcePosts.map(post => ({ ...post, type: 'resources' }))
+];
+
+// Sort by publication date
+const sortedPosts = allPosts.sort(
+  (a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf(),
+);
+
+const title = 'Article Explorer - HFT Framework Guide';
+const description = 'Browse and filter all articles in the HFT framework documentation with smart search and category filtering.';
+---
+
+<html lang="en">
+	<head>
+		<BaseHead title={title} description={description} />
+		<style>
+			main {
+				width: calc(100% - 2em);
+				max-width: 1200px;
+				margin: 0 auto;
+				padding: 1em;
+			}
+
+			.explorer-header {
+				text-align: center;
+				margin-bottom: 2em;
+			}
+
+			.explorer-header h1 {
+				margin: 0 0 0.5em 0;
+				color: rgb(var(--gray-dark));
+			}
+
+			.explorer-header p {
+				color: rgb(var(--gray));
+				font-size: 1.1em;
+				max-width: 600px;
+				margin: 0 auto 1em auto;
+				line-height: 1.6;
+			}
+
+			/* Controls Section */
+			.controls-section {
+				background: white;
+				border-radius: 12px;
+				box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+				padding: 24px;
+				margin-bottom: 2em;
+			}
+
+			.search-container {
+				position: relative;
+				margin-bottom: 24px;
+				max-width: 500px;
+				margin-left: auto;
+				margin-right: auto;
+			}
+
+			.search-input {
+				width: 100%;
+				padding: 12px 16px;
+				padding-right: 40px;
+				border: 2px solid #e2e8f0;
+				border-radius: 8px;
+				font-size: 16px;
+				transition: border-color 0.2s ease;
+			}
+
+			.search-input:focus {
+				outline: none;
+				border-color: #3b82f6;
+			}
+
+			.clear-search {
+				position: absolute;
+				right: 12px;
+				top: 50%;
+				transform: translateY(-50%);
+				background: none;
+				border: none;
+				font-size: 20px;
+				cursor: pointer;
+				color: #6b7280;
+				display: none;
+			}
+
+			.clear-search.show {
+				display: block;
+			}
+
+			.filter-container {
+				display: flex;
+				flex-direction: column;
+				gap: 20px;
+			}
+
+			.filter-group {
+				display: flex;
+				flex-direction: column;
+				gap: 8px;
+			}
+
+			.filter-group label {
+				font-weight: 600;
+				color: rgb(var(--gray-dark));
+				font-size: 14px;
+			}
+
+			.filter-buttons {
+				display: flex;
+				flex-wrap: wrap;
+				gap: 8px;
+			}
+
+			.filter-btn {
+				padding: 8px 16px;
+				border: 1px solid #e2e8f0;
+				background: white;
+				border-radius: 6px;
+				cursor: pointer;
+				font-size: 14px;
+				transition: all 0.2s ease;
+			}
+
+			.filter-btn:hover {
+				background: #f1f5f9;
+				border-color: #3b82f6;
+			}
+
+			.filter-btn.active {
+				background: #3b82f6;
+				color: white;
+				border-color: #3b82f6;
+			}
+
+			.reset-filters {
+				align-self: flex-start;
+				padding: 10px 20px;
+				background: #ef4444;
+				color: white;
+				border: none;
+				border-radius: 6px;
+				cursor: pointer;
+				font-size: 14px;
+				transition: background 0.2s ease;
+			}
+
+			.reset-filters:hover {
+				background: #dc2626;
+			}
+
+			/* Cards Section */
+			.cards-container {
+				margin-bottom: 3em;
+			}
+
+			.results-info {
+				margin-bottom: 20px;
+				color: rgb(var(--gray));
+				font-size: 14px;
+				font-weight: 500;
+			}
+
+			.cards-grid {
+				display: grid;
+				grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+				gap: 24px;
+			}
+
+			.article-card {
+				background: white;
+				border: 1px solid #e2e8f0;
+				border-radius: 12px;
+				overflow: hidden;
+				transition: all 0.2s ease;
+				display: flex;
+				flex-direction: column;
+			}
+
+			.article-card:hover {
+				border-color: #3b82f6;
+				box-shadow: 0 8px 25px rgba(59, 130, 246, 0.15);
+				transform: translateY(-2px);
+			}
+
+			.article-card.hidden {
+				display: none;
+			}
+
+			.card-header {
+				display: flex;
+				justify-content: space-between;
+				align-items: center;
+				padding: 16px 20px 12px;
+				border-bottom: 1px solid #f1f5f9;
+			}
+
+			.card-meta {
+				display: flex;
+				flex-direction: column;
+				gap: 6px;
+				align-items: flex-end;
+			}
+
+			.card-branch {
+				padding: 4px 12px;
+				border-radius: 20px;
+				font-size: 12px;
+				font-weight: 600;
+				text-transform: uppercase;
+			}
+
+			.card-branch.architecture { background: #dbeafe; color: #1e40af; }
+			.card-branch.performance { background: #fee2e2; color: #dc2626; }
+			.card-branch.components { background: #d1fae5; color: #059669; }
+			.card-branch.foundations { background: #fef3c7; color: #d97706; }
+
+			.card-difficulty {
+				padding: 4px 8px;
+				border-radius: 4px;
+				font-size: 11px;
+				font-weight: 500;
+				text-transform: capitalize;
+			}
+
+			.card-type {
+				padding: 2px 6px;
+				border-radius: 4px;
+				font-size: 10px;
+				font-weight: 500;
+				text-transform: uppercase;
+			}
+
+			.card-type.blog { background: #e0e7ff; color: #3730a3; }
+			.card-type.resources { background: #ecfdf5; color: #065f46; }
+
+			.card-difficulty.beginner { background: #d1fae5; color: #059669; }
+			.card-difficulty.intermediate { background: #fef3c7; color: #d97706; }
+			.card-difficulty.advanced { background: #fee2e2; color: #dc2626; }
+
+			.card-content {
+				padding: 0 20px 16px;
+				flex: 1;
+			}
+
+			.card-title {
+				margin: 0 0 12px 0;
+				font-size: 1.25em;
+				font-weight: 600;
+				line-height: 1.3;
+			}
+
+			.card-title a {
+				text-decoration: none;
+				color: rgb(var(--gray-dark));
+				transition: color 0.2s ease;
+			}
+
+			.card-title a:hover {
+				color: #3b82f6;
+			}
+
+			.card-description {
+				margin: 0 0 16px 0;
+				color: rgb(var(--gray));
+				line-height: 1.5;
+				font-size: 0.95em;
+			}
+
+			.card-tags {
+				display: flex;
+				flex-wrap: wrap;
+				gap: 6px;
+			}
+
+			.tag {
+				background: #f1f5f9;
+				color: #475569;
+				padding: 4px 8px;
+				border-radius: 4px;
+				font-size: 11px;
+				font-weight: 500;
+			}
+
+			.card-footer {
+				padding: 12px 20px 16px;
+				border-top: 1px solid #f1f5f9;
+				display: flex;
+				justify-content: space-between;
+				align-items: center;
+				font-size: 12px;
+				color: rgb(var(--gray));
+			}
+
+			.card-concepts {
+				font-style: italic;
+				max-width: 60%;
+				overflow: hidden;
+				text-overflow: ellipsis;
+				white-space: nowrap;
+			}
+
+			.stats-section {
+				display: grid;
+				grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+				gap: 20px;
+				margin: 2em 0;
+			}
+
+			.stat-card {
+				background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+				color: white;
+				padding: 20px;
+				border-radius: 12px;
+				text-align: center;
+			}
+
+			.stat-card h3 {
+				margin: 0 0 8px 0;
+				font-size: 2em;
+				font-weight: bold;
+			}
+
+			.stat-card p {
+				margin: 0;
+				opacity: 0.9;
+			}
+
+			@media (max-width: 768px) {
+				.filter-container {
+					gap: 16px;
+				}
+
+				.filter-buttons {
+					justify-content: center;
+				}
+
+				.cards-grid {
+					grid-template-columns: 1fr;
+					gap: 16px;
+				}
+
+				.filter-group {
+					text-align: center;
+				}
+
+				.card-footer {
+					flex-direction: column;
+					gap: 8px;
+					align-items: flex-start;
+				}
+
+				.card-concepts {
+					max-width: 100%;
+				}
+			}
+		</style>
+	</head>
+
+	<body>
+		<Header />
+		<main>
+			<!-- Statistics -->
+			<div class="stats-section">
+				<div class="stat-card">
+					<h3>{sortedPosts.length}</h3>
+					<p>Total Articles</p>
+				</div>
+				<div class="stat-card">
+					<h3>{sortedPosts.filter(post => post.data.mindmapBranch === 'Architecture').length}</h3>
+					<p>Architecture</p>
+				</div>
+				<div class="stat-card">
+					<h3>{sortedPosts.filter(post => post.data.mindmapBranch === 'Performance').length}</h3>
+					<p>Performance</p>
+				</div>
+				<div class="stat-card">
+					<h3>{sortedPosts.filter(post => post.data.mindmapBranch === 'Components').length}</h3>
+					<p>Component</p>
+				</div>
+				<div class="stat-card">
+					<h3>{sortedPosts.filter(post => post.data.mindmapBranch === 'Foundations').length}</h3>
+					<p>Foundations</p>
+				</div>
+			</div>
+
+			<!-- Search and Filter Controls -->
+			<div class="controls-section">
+				<div class="search-container">
+					<input type="text" id="searchInput" placeholder="Search articles..." class="search-input">
+					<button class="clear-search" id="clearSearch">×</button>
+				</div>
+				
+				<div class="filter-container">
+					<div class="filter-group">
+						<label>Branch:</label>
+						<div class="filter-buttons">
+							<button class="filter-btn active" data-filter="branch" data-value="all">All</button>
+							<button class="filter-btn" data-filter="branch" data-value="architecture">🏗️ Architecture</button>
+							<button class="filter-btn" data-filter="branch" data-value="performance">⚡ Performance</button>
+							<button class="filter-btn" data-filter="branch" data-value="components">🔧 Components</button>
+							<button class="filter-btn" data-filter="branch" data-value="foundations">🏛️ Foundations</button>
+						</div>
+					</div>
+					
+					<div class="filter-group">
+						<label>Difficulty:</label>
+						<div class="filter-buttons">
+							<button class="filter-btn active" data-filter="difficulty" data-value="all">All</button>
+							<button class="filter-btn" data-filter="difficulty" data-value="beginner">Beginner</button>
+							<button class="filter-btn" data-filter="difficulty" data-value="intermediate">Intermediate</button>
+							<button class="filter-btn" data-filter="difficulty" data-value="advanced">Advanced</button>
+						</div>
+					</div>
+					
+					<button class="reset-filters" id="resetFilters">Reset All Filters</button>
+				</div>
+			</div>
+
+			<!-- Article Cards Grid -->
+			<div class="cards-container">
+				<div class="results-info">
+					<span id="resultsCount">{sortedPosts.length}</span> articles found
+				</div>
+				
+				<div class="cards-grid" id="articlesGrid">
+					{sortedPosts.map(post => (
+						<div class="article-card" 
+							 data-branch={post.data.mindmapBranch?.toLowerCase() || 'foundations'}
+							 data-difficulty={post.data.difficulty || 'beginner'}
+							 data-tags={post.data.tags?.join(',') || ''}
+							 data-title={post.data.title.toLowerCase()}
+							 data-description={post.data.description?.toLowerCase() || ''}>
+							
+							<div class="card-header">
+								<div class={`card-branch ${post.data.mindmapBranch?.toLowerCase() || 'foundations'}`}>
+									{post.data.mindmapBranch || 'Foundations'}
+								</div>
+								<div class="card-meta">
+									<div class={`card-type ${post.type}`}>
+										{post.type === 'blog' ? '📝 Article' : '📚 Resource'}
+									</div>
+									<div class={`card-difficulty ${post.data.difficulty || 'beginner'}`}>
+										{post.data.difficulty || 'beginner'}
+									</div>
+								</div>
+							</div>
+							
+							<div class="card-content">
+								<h3 class="card-title">
+									<a href={`/${post.type}/${post.slug}/`}>{post.data.title}</a>
+								</h3>
+								<p class="card-description">{post.data.description}</p>
+								
+								{post.data.tags && (
+									<div class="card-tags">
+										{post.data.tags.map(tag => (
+											<span class="tag">{tag}</span>
+										))}
+									</div>
+								)}
+							</div>
+							
+							<div class="card-footer">
+								<div class="card-date">
+									{new Date(post.data.pubDate).toLocaleDateString()}
+								</div>
+								{post.data.concepts && (
+									<div class="card-concepts">
+										{post.data.concepts.slice(0, 3).join(', ')}
+									</div>
+								)}
+							</div>
+						</div>
+					))}
+				</div>
+			</div>
+		</main>
+
+		<script>
+			// State management
+			let currentBranchFilter = 'all';
+			let currentDifficultyFilter = 'all';
+			let currentSearchTerm = '';
+
+			// DOM elements
+			const searchInput = document.getElementById('searchInput');
+			const clearSearchBtn = document.getElementById('clearSearch');
+			const resetFiltersBtn = document.getElementById('resetFilters');
+			const resultsCount = document.getElementById('resultsCount');
+			const articlesGrid = document.getElementById('articlesGrid');
+			const allCards = document.querySelectorAll('.article-card');
+
+			// Filter buttons
+			const branchButtons = document.querySelectorAll('[data-filter="branch"]');
+			const difficultyButtons = document.querySelectorAll('[data-filter="difficulty"]');
+
+			// Search functionality
+			searchInput.addEventListener('input', (e) => {
+				currentSearchTerm = e.target.value.toLowerCase().trim();
+				
+				// Show/hide clear button
+				if (currentSearchTerm) {
+					clearSearchBtn.classList.add('show');
+				} else {
+					clearSearchBtn.classList.remove('show');
+				}
+				
+				applyFilters();
+			});
+
+			clearSearchBtn.addEventListener('click', () => {
+				searchInput.value = '';
+				currentSearchTerm = '';
+				clearSearchBtn.classList.remove('show');
+				applyFilters();
+			});
+
+			// Filter buttons functionality
+			branchButtons.forEach(button => {
+				button.addEventListener('click', (e) => {
+					// Update active state
+					branchButtons.forEach(btn => btn.classList.remove('active'));
+					e.target.classList.add('active');
+					
+					currentBranchFilter = e.target.dataset.value;
+					applyFilters();
+				});
+			});
+
+			difficultyButtons.forEach(button => {
+				button.addEventListener('click', (e) => {
+					// Update active state
+					difficultyButtons.forEach(btn => btn.classList.remove('active'));
+					e.target.classList.add('active');
+					
+					currentDifficultyFilter = e.target.dataset.value;
+					applyFilters();
+				});
+			});
+
+			// Reset all filters
+			resetFiltersBtn.addEventListener('click', () => {
+				// Reset search
+				searchInput.value = '';
+				currentSearchTerm = '';
+				clearSearchBtn.classList.remove('show');
+				
+				// Reset filters
+				currentBranchFilter = 'all';
+				currentDifficultyFilter = 'all';
+				
+				// Update button states
+				branchButtons.forEach(btn => {
+					btn.classList.toggle('active', btn.dataset.value === 'all');
+				});
+				difficultyButtons.forEach(btn => {
+					btn.classList.toggle('active', btn.dataset.value === 'all');
+				});
+				
+				applyFilters();
+			});
+
+			// Main filtering function
+			function applyFilters() {
+				let visibleCount = 0;
+				
+				allCards.forEach(card => {
+					let isVisible = true;
+					
+					// Branch filter
+					if (currentBranchFilter !== 'all') {
+						const cardBranch = card.dataset.branch;
+						if (cardBranch !== currentBranchFilter) {
+							isVisible = false;
+						}
+					}
+					
+					// Difficulty filter
+					if (currentDifficultyFilter !== 'all') {
+						const cardDifficulty = card.dataset.difficulty;
+						if (cardDifficulty !== currentDifficultyFilter) {
+							isVisible = false;
+						}
+					}
+					
+					// Search filter
+					if (currentSearchTerm) {
+						const cardTitle = card.dataset.title || '';
+						const cardDescription = card.dataset.description || '';
+						const cardTags = card.dataset.tags || '';
+						
+						const searchableText = `${cardTitle} ${cardDescription} ${cardTags}`;
+						if (!searchableText.includes(currentSearchTerm)) {
+							isVisible = false;
+						}
+					}
+					
+					// Apply visibility
+					if (isVisible) {
+						card.classList.remove('hidden');
+						visibleCount++;
+					} else {
+						card.classList.add('hidden');
+					}
+				});
+				
+				// Update results count
+				resultsCount.textContent = visibleCount;
+			}
+
+			// Initialize on page load
+			document.addEventListener('DOMContentLoaded', () => {
+				applyFilters();
+			});
+		</script>
+
+		<Footer />
+	</body>
+</html>

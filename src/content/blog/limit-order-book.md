@@ -1,7 +1,14 @@
 ---
-title: Building a Limit Order Book in Rust
-description: Step-by-step guide to designing and implementing a performant limit order book core for HFT applications using Rust, covering data structures, order matching logic, and best practices.
-pubDate: "Aug 2 2025"
+title: "Building a Limit Order Book in Rust"
+description: "Step-by-step guide to designing and implementing a performant limit order book core for HFT applications using Rust, covering data structures, order matching logic, and best practices."
+pubDate: "Aug 02 2025"
+mindmapBranch: "Components"
+difficulty: "advanced"
+concepts: ["Order Book", "Matching Engine", "Data Structures", "Order Management"]
+tags: ["rust", "hft", "order-book", "matching-engine", "implementation"]
+prerequisites: ["building-limit-order-book", "market-microstructure-hft"]
+relatedArticles: ["advanced-order-types-and-persistence"]
+seriesOrder: 4
 ---
 
 # Introduction

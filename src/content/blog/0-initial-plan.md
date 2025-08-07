@@ -2,6 +2,11 @@
 title: "Building a trading framework in Rust: the initial plan"
 description: "Initial plan on building a trading framework in Rust"
 pubDate: "Jul 26 2025"
+mindmapBranch: "Foundations"
+difficulty: "beginner"
+concepts: ["Project Planning", "Rust", "HFT Overview"]
+tags: ["rust", "hft", "planning", "introduction"]
+seriesOrder: 1
 ---
 
 This project is not just about code. It’s a structured journey into the world of trading systems, with a strong focus on high-frequency trading (HFT), system design, and code quality. We’ll build an open-source framework in Rust that reflects the practices of production-grade software: modular, testable, observable, and fast.

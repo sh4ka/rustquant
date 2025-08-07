@@ -1,7 +1,12 @@
 ---
-title: Curated resources on market microstructure and HFT fundamentals
-description: A collection of trusted books, academic papers, protocol specs, and technical guides to learn more about market microstructure, matching engines, and electronic trading systems.
-pubDate: 2025-07-29
+title: "Curated resources on market microstructure and HFT fundamentals"
+description: "A collection of trusted books, academic papers, protocol specs, and technical guides to learn more about market microstructure, matching engines, and electronic trading systems."
+pubDate: "Jul 29 2025"
+mindmapBranch: "Foundations"
+difficulty: "intermediate"
+concepts: ["Market Microstructure", "Academic Papers", "Protocol Specifications", "Trading Theory"]
+tags: ["resources", "market-microstructure", "hft", "academic", "protocols"]
+relatedArticles: ["market-microstructure-hft"]
 ---
 
 This page collects high-quality resources that I personally consult while learning about high-frequency trading and the structure of modern electronic markets. These are not endorsements, but trusted starting points for deeper understanding.

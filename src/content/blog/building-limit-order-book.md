@@ -3,7 +3,7 @@ title: "Schema for building a limit order book in Rust"
 description: "A high‑level overview of the architecture and core components of a limit order book in a professional HFT framework using Rust."
 pubDate: "Jul 31 2025"
 mindmapBranch: "Components"
-concepts: ["Order Management", "Matching Engine", "Data Structures", "Performance Optimization"]
+concepts: ["Order Management"]
 relatedArticles: ["limit-order-book", "advanced-order-types-and-persistence"]
 prerequisites: ["phase-1-foundations-of-hft-with-rust"]
 difficulty: "intermediate"

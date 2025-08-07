@@ -1,7 +1,14 @@
 ---
-title: Phase 1 - Foundations of High-Frequency Trading with Rust
-description: In this first phase of our journey into building a professional HFT framework in Rust, we focus on deepening our understanding of trading systems, setting realistic goals, and establishing strong technical foundations.
-pubDate: 2025-07-28
+title: "Phase 1 - Foundations of High-Frequency Trading with Rust"
+description: "In this first phase of our journey into building a professional HFT framework in Rust, we focus on deepening our understanding of trading systems, setting realistic goals, and establishing strong technical foundations."
+pubDate: "Jul 28 2025"
+mindmapBranch: "Foundations"
+difficulty: "intermediate"
+concepts: ["HFT Architecture", "Rust Ecosystem", "System Design", "Trading Fundamentals"]
+tags: ["rust", "hft", "architecture", "foundations", "phase-1"]
+prerequisites: ["1-project-roadmap"]
+relatedArticles: ["0-initial-plan", "market-microstructure-hft"]
+seriesOrder: 3
 ---
 
 High-frequency trading (HFT) is a domain where performance, precision, and reliability are paramount. In this first phase of our journey, we lay the groundwork not only for the codebase but for our mental model of trading systems themselves. This article covers the goals, knowledge areas, tools, and design patterns we'll be using throughout the project.

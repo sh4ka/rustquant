@@ -1,7 +1,14 @@
 ---
-title: Advanced Order Types and Event Sourcing
-description: We extend our basic limit order book to support iceberg and stop-loss orders, and begin designing persistence via event sourcing to prepare the system for production-grade use.
-pubDate: 04 Aug 2025
+title: "Advanced Order Types and Event Sourcing"
+description: "We extend our basic limit order book to support iceberg and stop-loss orders, and begin designing persistence via event sourcing to prepare the system for production-grade use."
+pubDate: "Aug 04 2025"
+mindmapBranch: "Components"
+difficulty: "advanced"
+concepts: ["Advanced Orders", "Event Sourcing", "Persistence", "Order Types"]
+tags: ["rust", "hft", "event-sourcing", "order-types", "persistence"]
+prerequisites: ["limit-order-book"]
+relatedArticles: ["building-limit-order-book"]
+seriesOrder: 5
 ---
 
 # Advanced Order Types and Event Sourcing

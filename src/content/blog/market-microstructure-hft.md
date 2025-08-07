@@ -1,7 +1,12 @@
 ---
-title: Understanding market microstructure in high-frequency trading
-description: A deep dive into the fundamental mechanics of modern electronic markets. This article explains what happens at the order book level, how spreads, ticks, and depth work, and why microseconds matter in the world of high-frequency trading.
-pubDate: 2025-07-29
+title: "Understanding market microstructure in high-frequency trading"
+description: "A deep dive into the fundamental mechanics of modern electronic markets. This article explains what happens at the order book level, how spreads, ticks, and depth work, and why microseconds matter in the world of high-frequency trading."
+pubDate: "Jul 29 2025"
+mindmapBranch: "Foundations"
+difficulty: "intermediate"
+concepts: ["Market Microstructure", "Order Book", "Price Discovery", "Market Making"]
+tags: ["hft", "market-microstructure", "order-book", "trading", "theory"]
+relatedArticles: ["building-limit-order-book", "limit-order-book"]
 ---
 
 Before we dive in, a quick **disclaimer**: I’m not an expert in market microstructure, and this article is not intended as authoritative guidance. Rather, this is a synthesis of publicly available knowledge as I build my own understanding of how modern electronic markets work, especially from the perspective of high-frequency trading (HFT) system design.
