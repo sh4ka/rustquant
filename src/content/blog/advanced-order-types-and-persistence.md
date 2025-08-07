@@ -1,5 +1,5 @@
 ---
-title: "Advanced Order Types and Event Sourcing"
+title: "Advanced order types and event sourcing"
 description: "We extend our basic limit order book to support iceberg and stop-loss orders, and begin designing persistence via event sourcing to prepare the system for production-grade use."
 pubDate: "Aug 04 2025"
 mindmapBranch: "Components"
@@ -11,7 +11,7 @@ relatedArticles: ["building-limit-order-book"]
 seriesOrder: 5
 ---
 
-# Advanced Order Types and Event Sourcing
+# Advanced order types and event sourcing
 
 In the [previous article](/blog/limit-order-book/), we built a minimal limit order book implementation in Rust. In this article, we’ll take the next step toward a production-ready HFT engine by incorporating more complex order types and adding an event sourcing mechanism to persist the book’s state.
 
@@ -19,7 +19,7 @@ These features are not just bells and whistles—they’re fundamental for real-
 
 ---
 
-## 1. Iceberg Orders
+## Iceberg orders
 
 An **iceberg order** is a large order split into smaller visible "child" orders. The main goal is to avoid revealing the full size of the trade to the market.
 
@@ -42,7 +42,7 @@ pub struct IcebergOrder {
 }
 ```
 
-### Execution Logic
+### Execution logic
 
 You can extend the matching engine to treat `visible_quantity` as the public quantity, but track and decrement `remaining` behind the scenes. Once a visible slice is executed, a new slice is reinserted, creating the iceberg effect.
 
@@ -52,7 +52,7 @@ You can extend the matching engine to treat `visible_quantity` as the public qua
 
 ---
 
-## 2. Stop-Loss Orders
+## Stop-loss orders
 
 A **stop-loss order** is only activated when the market crosses a certain price threshold.
 
@@ -66,7 +66,7 @@ pub struct StopOrder {
 }
 ```
 
-### Triggering Logic
+### Triggering logic
 
 Stop orders are not added to the order book directly. Instead, they reside in a "watchlist" until the price crosses their trigger. When this happens, they are converted to regular market or limit orders.
 
@@ -76,11 +76,11 @@ Stop orders are not added to the order book directly. Instead, they reside in a 
 
 ---
 
-## 3. Adding Event Sourcing
+## Adding event sourcing
 
 To introduce **event sourcing**, we shift our focus from storing the current state to recording the sequence of events that led to it. This makes the system more robust, auditable, and easier to recover.
 
-### Core Event Types
+### Core event types
 
 ```rust
 pub enum OrderEvent {
@@ -93,7 +93,7 @@ pub enum OrderEvent {
 }
 ```
 
-### Event Log
+### Event log
 
 We append every event to a persistent log (in-memory for now, but ready for durable storage like disk or database).
 
@@ -110,7 +110,7 @@ impl EventStore {
 }
 ```
 
-### Rebuilding the Order Book
+### Rebuilding the order book
 
 Given an empty book, we can replay the sequence of events to reconstruct the exact state of the system. This is crucial for crash recovery and audit trails.
 
@@ -120,7 +120,7 @@ Given an empty book, we can replay the sequence of events to reconstruct the exa
 
 ---
 
-## 4. Bringing It Together
+## Bringing it together
 
 With these extensions, our order book system begins to resemble the core of a professional HFT engine:
 
@@ -130,7 +130,7 @@ With these extensions, our order book system begins to resemble the core of a pr
 
 ---
 
-## Recommended Reading
+## Recommended reading
 
 To explore these concepts in more depth, here are two excellent books:
 
@@ -142,7 +142,7 @@ To explore these concepts in more depth, here are two excellent books:
 
 ---
 
-## What’s Next?
+## What's next?
 
 In upcoming articles, we will:
 

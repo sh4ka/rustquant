@@ -1,5 +1,5 @@
 ---
-title: "Building a Limit Order Book in Rust"
+title: "Building a limit order book in Rust"
 description: "Step-by-step guide to designing and implementing a performant limit order book core for HFT applications using Rust, covering data structures, order matching logic, and best practices."
 pubDate: "Aug 02 2025"
 mindmapBranch: "Components"
@@ -20,7 +20,7 @@ In high-frequency trading systems, the limit order book (LOB) is the fundamental
 * Implement order insertion, cancellation, and matching logic
 * Follow Rust best practices and design patterns for performance and maintainability
 
-# 1. Core data types
+# Core data types
 
 First, let us define the basic building blocks: the `Order` struct and the enumeration for buy/sell sides.
 
@@ -49,7 +49,7 @@ pub struct Order {
 * We use `u64` for `price` and `quantity` to avoid negative values and ensure wide ranges.
 * `timestamp` ensures strict FIFO matching within the same price level.
 
-# 2. Price level and order queue
+# Price level and order queue
 
 Each price level holds a queue of orders in time priority. A `VecDeque` is a natural choice:
 
@@ -80,7 +80,7 @@ impl PriceLevel {
 * `VecDeque` offers O(1) push/pop at both ends.
 * Wrapping in a `PriceLevel` struct gives a clear API for managing orders.
 
-# 3. Book sides and data structure choice
+# Book sides and data structure choice
 
 To maintain sorted price levels, we need a structure keyed by price. Two common options:
 
@@ -129,7 +129,7 @@ impl BookSide {
 }
 ```
 
-# 4. Matching engine logic
+# Matching engine logic
 
 The matching engine takes incoming orders and attempts to fill them against the opposite side:
 
@@ -205,7 +205,7 @@ impl OrderBook {
 }
 ```
 
-# 5. Putting it all together
+# Putting it all together
 
 Here is an example usage:
 
@@ -224,14 +224,14 @@ fn main() {
 
 This will match 5 units at price 100, leaving the ask side with 5 at 100.
 
-# 6. Next steps and optimizations
+# Next steps and optimizations
 
 * Memory Management: Use object pools or arena allocators for orders to reduce heap overhead.
 * Concurrency: For multi-threaded matching, partition the book by instrument or shard price ranges.
 * Performance Tuning: Replace `BTreeMap` with a specialized skiplist or a custom radix tree for lower latency.
 * In the following articles we will add comprehensive unit and integration tests as well as memory and CPU benchmarking harnesses to measure throughput and latency and guide our optimizations for high-frequency trading environments.
 
-# 7. Performance analysis and discussion
+# Performance analysis and discussion
 
 While this Rust-based limit order book is functionally correct, in a high-frequency trading (HFT) context true performance comes down to microsecond and even nanosecond optimizations. Here is an overview of where our current design stands and which areas require further tuning:
 - Algorithmic complexity:

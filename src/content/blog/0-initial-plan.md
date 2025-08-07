@@ -34,7 +34,7 @@ This is not a toy project. From the start, we’ll use good engineering practice
 
 The journey is structured in five stages. Each one brings new components, new design constraints, and new opportunities to optimize.
 
-### 1. Foundations
+### Foundations
 
 **Objective:** set up our environment and understand the basics of market mechanics.
 
@@ -52,7 +52,7 @@ Deliverables:
 
 ---
 
-### 2. Market data ingestion
+### Market data ingestion
 
 **Objective:** build a fast and modular market data feed processor.
 
@@ -69,7 +69,7 @@ Deliverables:
 
 ---
 
-### 3. Strategy engine
+### Strategy engine
 
 **Objective:** create a strategy engine that works both in simulation and live environments.
 
@@ -86,7 +86,7 @@ Deliverables:
 
 ---
 
-### 4. Order execution and risk
+### Order execution and risk
 
 **Objective:** send orders safely, track their status, and handle rejection, risk, and reconciliation.
 
@@ -103,7 +103,7 @@ Deliverables:
 
 ---
 
-### 5. Infrastructure and operations
+### Infrastructure and operations
 
 **Objective:** make the system observable and production-ready.
 

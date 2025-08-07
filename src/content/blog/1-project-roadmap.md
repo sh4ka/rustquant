@@ -1,5 +1,5 @@
 ---
-title: "Roadmap: building a trading framework in Rust"
+title: "Roadmap: Building a trading framework in Rust"
 description: "Roadmap for project completion"
 pubDate: "Jul 27 2025"
 mindmapBranch: "Foundations"
@@ -10,7 +10,7 @@ prerequisites: ["0-initial-plan"]
 seriesOrder: 2
 ---
 
-# Roadmap: building a trading framework in Rust
+# Roadmap: Building a trading framework in Rust
 
 We’ve divided the project into 5+1 distinct phases. Each phase results in working code, detailed articles, and measurable improvements. The goal is to learn HFT system design by building clean, testable, observable Rust code.
 

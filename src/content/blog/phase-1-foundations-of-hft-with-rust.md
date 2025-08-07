@@ -1,5 +1,5 @@
 ---
-title: "Phase 1 - Foundations of High-Frequency Trading with Rust"
+title: "Phase 1 - Foundations of high-frequency trading with Rust"
 description: "In this first phase of our journey into building a professional HFT framework in Rust, we focus on deepening our understanding of trading systems, setting realistic goals, and establishing strong technical foundations."
 pubDate: "Jul 28 2025"
 mindmapBranch: "Foundations"
@@ -13,7 +13,7 @@ seriesOrder: 3
 
 High-frequency trading (HFT) is a domain where performance, precision, and reliability are paramount. In this first phase of our journey, we lay the groundwork not only for the codebase but for our mental model of trading systems themselves. This article covers the goals, knowledge areas, tools, and design patterns we'll be using throughout the project.
 
-## Goals of phase 1
+## Goals of Phase 1
 
 Phase 1 sets the direction for everything we’ll build later. The goals are:
 
@@ -72,7 +72,7 @@ Here are the architectural and code design principles we'll enforce:
 
 We'll document these patterns with real code in each crate, and they’ll guide how we grow the framework.
 
-## Development milestones in phase 1
+## Development milestones in Phase 1
 
 | Week | Focus                                | Deliverables                                      |
 |------|--------------------------------------|--------------------------------------------------|
@@ -85,7 +85,7 @@ We'll document these patterns with real code in each crate, and they’ll guide 
 
 By the end of Phase 1, we’ll have a working crate that connects to a real-time feed (e.g. Binance Spot), parses trades or order book events, and logs them with latency and jitter measurements.
 
-## Blog infrastructure & GitHub setup
+## Blog infrastructure and GitHub setup
 
 We will document every step of the journey in our blog, hosted at [https://rustquant.dev](https://rustquant.dev).
 To keep the project open and collaborative, we will:
@@ -97,6 +97,6 @@ To keep the project open and collaborative, we will:
 
 These practices will set the tone for a high-quality, professional Rust codebase.
 
-## What's Next?
+## What's next?
 
 In the next milestone article, we’ll begin exploring **market microstructure** in detail. We’ll analyze how modern exchanges operate, what kinds of orders are supported, and how latency influences execution strategies. Then we’ll link that knowledge to how we might model a feed handler and order book in Rust.
