@@ -1,150 +1,163 @@
 ---
-title: "Building a trading framework in Rust: the initial plan"
-description: "Initial plan on building a trading framework in Rust"
+title: "Building a high-frequency trading framework in Rust: the initial plan"
+description: "Comprehensive overview of building an ultra-low latency HFT framework targeting sub-microsecond performance with detailed architectural specifications"
 pubDate: "Jul 26 2025"
 mindmapBranch: "Foundations"
-difficulty: "beginner"
-concepts: ["Project Planning", "Rust", "HFT Overview"]
-tags: ["rust", "hft", "planning", "introduction"]
+difficulty: "intermediate"
+concepts: ["HFT Architecture", "Ultra-low Latency", "System Design", "Performance Engineering"]
+tags: ["rust", "hft", "architecture", "performance", "latency"]
 seriesOrder: 1
 ---
 
-This project is not just about code. It’s a structured journey into the world of trading systems, with a strong focus on high-frequency trading (HFT), system design, and code quality. We’ll build an open-source framework in Rust that reflects the practices of production-grade software: modular, testable, observable, and fast.
+High-frequency trading demands the absolute peak of system performance: sub-microsecond latencies, millions of messages per second, and deterministic behavior under extreme load. This series documents the construction of a production-grade HFT framework in Rust, targeting latency requirements that push the boundaries of what's technically possible.
 
-Rust is an ideal tool for this purpose. It offers control over performance without compromising safety, and allows us to express low-latency architectures in a way that’s explicit and reliable.
+This is not an educational toy or proof-of-concept. We're building a framework capable of competing in real markets, with the same architectural principles and performance characteristics used by quantitative trading firms and market makers operating at nanosecond scales.
 
-Our goal is to learn by building. This includes a professional library for trading in Rust, and a set of articles that teach, explain, and reflect on every major concept and design decision.
+## Performance targets
 
----
+The framework targets performance levels that define competitive HFT systems:
 
-## The vision
+**Latency requirements:**
+- Market data processing: < 100 nanoseconds
+- Signal generation: < 500 nanoseconds  
+- Order submission: < 1 microsecond
+- Risk checks: < 200 nanoseconds
+- End-to-end latency: < 2 microseconds
 
-We aim to create:
+**Throughput requirements:**
+- Market data ingestion: 10M+ messages/second
+- Order processing: 100K+ orders/second
+- Order book updates: 1M+ updates/second
 
-* A learning resource for engineers who want to go deep into HFT and low-latency trading.
-* A modular Rust library that abstracts common trading components (market data, execution, strategy logic, risk management).
-* A series of articles that show, step by step, how to build, measure, and reason about every part of a trading system.
-* A professional-grade architecture that can serve as a base for real-world experimentation.
+These targets represent real-world competitive requirements, not theoretical benchmarks.
 
-This is not a toy project. From the start, we’ll use good engineering practices: benchmarks, CI, abstractions with clear boundaries, latency metrics, logging, and thoughtful design patterns.
+## Core architectural principles
 
----
+### Memory management strategy
 
-## The roadmap
+All hot-path operations use pre-allocated memory pools with zero dynamic allocation. The system employs stack-based allocation for critical paths, custom NUMA-aware allocators, and zero-copy message parsing. Every data structure is designed for cache efficiency and predictable memory access patterns.
 
-The journey is structured in five stages. Each one brings new components, new design constraints, and new opportunities to optimize.
+### CPU optimization approach
 
-### Foundations
+The architecture maximizes CPU efficiency through cache-friendly sequential data structures, minimal branching in hot paths, SIMD vectorization for bulk operations, and dedicated thread affinity for critical components. Lock-free programming with atomic operations eliminates contention.
 
-**Objective:** set up our environment and understand the basics of market mechanics.
+### Threading model
 
-Topics:
+Core trading logic runs single-threaded to avoid context switching overhead. Dedicated threads handle specific functions (market data, order management, risk) with carefully isolated communication channels. Real-time scheduling ensures predictable thread priority.
 
-* Market structure: what is a limit order book? what does it mean to be a market maker or a taker?
-* Basic order types, spread, depth, latency.
-* Installing Rust and preparing the system for low-latency workloads.
-* Picking an async runtime (or going fully sync), performance benchmarking with `criterion`, building flamegraphs.
+## System architecture overview
 
-Deliverables:
+### Market data processing pipeline
 
-* A toy exchange simulator with a naive matching engine.
-* Project layout with workspaces, logging, config handling, and basic tests.
+The system receives market data through kernel bypass networking (DPDK), processes messages via zero-copy parsing with SIMD optimization, and maintains order books using fixed-size arrays for predictable memory layout. All operations target cache-line optimization.
 
----
+### Trading engine core
 
-### Market data ingestion
+Strategy execution operates through a trait-based interface allowing compile-time optimization. Order management uses pre-allocated object pools with atomic operations. The risk engine performs real-time position tracking and exposure calculation within nanosecond budgets.
 
-**Objective:** build a fast and modular market data feed processor.
+### Message processing
 
-Topics:
+All message types use repr(C) structs for optimal memory layout. Parsing employs template specialization and compile-time optimization. The system processes messages through lock-free ring buffers with minimal validation in hot paths.
 
-* How to receive data from exchanges: WebSocket, REST, UDP, or FIX.
-* Efficient JSON/Protobuf decoding.
-* Ring buffers and lock-free queues for ingestion.
-* Designing a clean feed abstraction to allow real/simulated data interchangeably.
+## Implementation roadmap
 
-Deliverables:
+### Phase 1: Core infrastructure (Weeks 1-6)
 
-* A `market_data` crate with multiple feed types and a performance benchmark suite.
+**Objective:** Establish the foundational components and measurement infrastructure.
 
----
+**Key deliverables:**
+- Memory management system with object pools and custom allocators
+- Lock-free ring buffers and atomic data structures  
+- Comprehensive benchmarking suite with nanosecond precision
+- CPU affinity and thread isolation framework
 
-### Strategy engine
+**Performance validation:**
+- Memory allocation latency: < 50 nanoseconds
+- Ring buffer operations: < 10 nanoseconds
+- Thread wake-up time: < 100 nanoseconds
 
-**Objective:** create a strategy engine that works both in simulation and live environments.
+### Phase 2: Market data ingestion (Weeks 7-12)
 
-Topics:
+**Objective:** Build ultra-low latency market data processing pipeline.
 
-* Event-driven architecture and trait-based strategies.
-* Managing state: snapshots, time series, internal caches.
-* Testing strategies offline: input recording, replay systems, property-based testing.
+**Key deliverables:**
+- Kernel bypass networking with DPDK integration
+- Zero-copy message parsing with SIMD optimization
+- Order book reconstruction with cache-optimized data structures
+- Market data normalization and gap detection
 
-Deliverables:
+**Performance validation:**
+- UDP packet processing: < 200 nanoseconds
+- Message parsing: < 50 nanoseconds
+- Order book updates: < 100 nanoseconds
 
-* A `strategy_engine` crate with basic built-in strategies (e.g. VWAP, momentum).
-* A simulation harness to run strategies offline on recorded data.
+### Phase 3: Trading engine (Weeks 13-18)
 
----
+**Objective:** Implement the core trading logic with nanosecond-level performance.
 
-### Order execution and risk
+**Key deliverables:**
+- Strategy execution framework with compile-time optimization
+- Signal generation with vectorized calculations
+- Order management with pre-allocated pools
+- Trade execution and fill processing
 
-**Objective:** send orders safely, track their status, and handle rejection, risk, and reconciliation.
+**Performance validation:**
+- Strategy signal generation: < 500 nanoseconds
+- Order creation and routing: < 300 nanoseconds
+- Position updates: < 100 nanoseconds
 
-Topics:
+### Phase 4: Risk management (Weeks 19-22)
 
-* Design of an execution API: sync vs async, traits vs channels.
-* Sending to real or simulated exchanges.
-* Risk management hooks: position size, exposure, cancel-on-disconnect, kill-switch logic.
+**Objective:** Add real-time risk controls without impacting latency.
 
-Deliverables:
+**Key deliverables:**
+- Position tracking with atomic operations
+- Exposure calculation and limit checking
+- Rate limiting and price validation
+- Emergency circuit breakers
 
-* An `execution` crate that abstracts exchange interaction.
-* Risk controls embedded in the order flow.
+**Performance validation:**
+- Risk check execution: < 200 nanoseconds
+- Position calculation: < 100 nanoseconds
+- Limit validation: < 50 nanoseconds
 
----
+### Phase 5: Production systems (Weeks 23-26)
 
-### Infrastructure and operations
+**Objective:** Complete the system with monitoring and operational capabilities.
 
-**Objective:** make the system observable and production-ready.
+**Key deliverables:**
+- Lock-free metrics collection
+- Structured logging with minimal overhead
+- Configuration management and deployment
+- Exchange connectivity and order routing
 
-Topics:
+**Performance validation:**
+- End-to-end latency: < 2 microseconds
+- System throughput: 10M+ messages/second
+- Resource utilization: < 50% CPU on dedicated cores
 
-* Metrics with `tracing`, Prometheus, and histogram-based latency measurement.
-* Configuration management and error handling.
-* Docker setup, simulation runners, and dashboards.
+## Technical approach
 
-Deliverables:
+### Rust-specific optimizations
 
-* A full containerized version of the system with monitoring tools.
-* Real-time metrics dashboard and structured logs.
+The framework leverages Rust's zero-cost abstractions, compile-time optimization, and memory safety without runtime overhead. Unsafe blocks are used judiciously for performance-critical sections with comprehensive safety documentation.
 
----
+### Hardware integration
 
-## Design principles
+The system is designed for high-end server hardware with fast RAM, NVMe storage, and low-latency networking. CPU features like [AVX-512](https://en.wikipedia.org/wiki/AVX-512) and hardware timestamps are utilized where available.
 
-Throughout the project we will follow a few core ideas:
+### Measurement and validation
 
-* **Performance matters**: we’ll profile early and often.
-* **Clean boundaries**: each component will be abstracted in its own crate.
-* **Testability**: everything can be simulated, tested, and mocked.
-* **Observability**: logs and metrics are part of the design, not an afterthought.
-* **Code quality**: even in high-performance systems, correctness comes first.
+Every component includes comprehensive benchmarking with statistical analysis. Latency measurements use high-resolution timers with outlier detection. Performance regression testing ensures optimizations don't degrade over time.
 
----
+## Why this matters
 
-## Who is this for?
+Modern algorithmic trading operates at the physical limits of computation and networking. Success requires understanding not just trading strategies but the entire technology stack from kernel scheduling to CPU cache behavior. This framework provides a complete reference implementation demonstrating these principles in practice.
 
-This project is written for engineers who:
-
-* Are interested in algorithmic and quantitative trading.
-* Want to learn HFT system architecture by building from scratch.
-* Already know Rust and want to apply it to a challenging, real-world domain.
-* Care about software quality, clean design, and performance.
-
----
+The resulting system will serve as both a learning resource for engineers entering quantitative finance and a foundation for real trading applications requiring institutional-grade performance.
 
 ## Next steps
 
-The next article will walk through the technical setup: how to structure the project, how to write a simple market simulator, and how to prepare for the challenges ahead.
+The following article details Phase 1 implementation, starting with memory management systems and benchmarking infrastructure. Each subsequent article provides complete implementation details with performance analysis and validation results.
 
-This is the beginning of a long journey. We’ll keep the code clean, the benchmarks honest, and the lessons practical.
+This documentation serves as both tutorial and specification, ensuring every design decision is explained and every performance claim is measurable.
