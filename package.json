@@ -18,16 +18,17 @@
     "@astrojs/mdx": "4.3.0",
     "@astrojs/rss": "4.0.11",
     "@astrojs/sitemap": "3.4.1",
+    "@fortawesome/fontawesome-free": "^7.0.0",
     "astro": "5.10.1",
-    "rehype-external-links": "^3.0.0",
-    "typescript": "5.8.3",
     "d3": "^7.9.0",
+    "rehype-autolink-headings": "^7.1.0",
+    "rehype-external-links": "^3.0.0",
     "remark-wiki-link": "^2.0.1",
-    "rehype-autolink-headings": "^7.1.0"
+    "typescript": "5.8.3"
   },
   "devDependencies": {
-    "wrangler": "4.21.x",
-    "@types/d3": "^7.4.3"
+    "@types/d3": "^7.4.3",
+    "wrangler": "4.21.x"
   },
   "scripts": {
     "astro": "astro",
