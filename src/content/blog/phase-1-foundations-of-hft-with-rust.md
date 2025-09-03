@@ -7,7 +7,7 @@ difficulty: "intermediate"
 concepts: ["Project Structure", "Benchmarking", "Performance Measurement", "Rust Workspace"]
 tags: ["rust", "hft", "benchmarking", "infrastructure", "performance"]
 prerequisites: ["0-initial-plan"]
-relatedArticles: ["1-project-roadmap"]
+relatedArticles: ["1-project-roadmap", "numa-allocators-beginner"]
 seriesOrder: 3
 ---
 
@@ -439,4 +439,4 @@ These measurements establish the baseline performance characteristics required f
 
 ## Next steps
 
-Part 2 of Phase 1 covers advanced memory management techniques including custom allocators, lock-free data structures, and NUMA optimization. We'll implement object pools, ring buffers, and cache-optimized data structures that form the foundation for ultra-low latency operations.
+Part 2 of Phase 1 covers advanced memory management techniques including custom allocators, lock-free data structures, and NUMA optimization. For beginners to NUMA concepts, start with our [introduction to NUMA allocators](/blog/numa-allocators-beginner/), then proceed to the [comprehensive memory management guide](/blog/phase-1-part-2-advanced-memory-management/). We'll implement object pools, ring buffers, and cache-optimized data structures that form the foundation for ultra-low latency operations.

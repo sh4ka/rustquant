@@ -2,8 +2,8 @@
 title: "Acquiring Knowledge for HFT Benchmarking Mastery"
 description: "A comprehensive guide to building the multidisciplinary expertise required for effective HFT system benchmarking and performance validation"
 pubDate: "Aug 08 2025"
-mindmapBranch: "Performance"
-difficulty: "advanced"
+mindmapBranch: "Foundations"
+difficulty: "beginner"
 concepts: ["Benchmarking", "Performance Engineering", "Systems Programming", "Hardware Optimization", "Statistical Analysis"]
 tags: ["benchmarking", "performance", "systems", "rust", "hft", "optimization", "statistics"]
 relatedArticles: ["general-resources", "market-microstructure"]

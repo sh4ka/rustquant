@@ -3,7 +3,7 @@ title: "Curated resources on market microstructure and HFT fundamentals"
 description: "A collection of trusted books, academic papers, protocol specs, and technical guides to learn more about market microstructure, matching engines, and electronic trading systems."
 pubDate: "Jul 29 2025"
 mindmapBranch: "Foundations"
-difficulty: "intermediate"
+difficulty: "beginner"
 concepts: ["Market Microstructure", "Academic Papers", "Protocol Specifications", "Trading Theory"]
 tags: ["resources", "market-microstructure", "hft", "academic", "protocols"]
 relatedArticles: ["market-microstructure-hft"]

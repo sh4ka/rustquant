@@ -7,7 +7,7 @@ difficulty: "intermediate"
 concepts: ["Benchmarking", "Performance Measurement", "TSC Timing", "Statistical Analysis"]
 tags: ["rust", "hft", "benchmarking", "performance", "timing", "statistics"]
 prerequisites: ["phase-1-foundations-of-hft-with-rust"]
-relatedArticles: ["phase-1-part-2-advanced-memory-management", "building-limit-order-book"]
+relatedArticles: ["phase-1-part-2-advanced-memory-management", "building-limit-order-book", "numa-allocators-beginner"]
 seriesOrder: 5
 ---
 
@@ -290,7 +290,7 @@ Tests automatically fail when performance degrades below specified thresholds, p
 
 ## Environmental optimization
 
-The framework includes system configuration validation to ensure optimal benchmarking conditions. [CPU frequency scaling](https://en.wikipedia.org/wiki/Dynamic_frequency_scaling) and [NUMA topology](https://en.wikipedia.org/wiki/Non-uniform_memory_access) significantly impact measurement consistency:
+The framework includes system configuration validation to ensure optimal benchmarking conditions. [CPU frequency scaling](https://en.wikipedia.org/wiki/Dynamic_frequency_scaling) and [NUMA topology](https://en.wikipedia.org/wiki/Non-uniform_memory_access) significantly impact measurement consistency. For an introduction to NUMA concepts and their performance implications, see our [NUMA allocators guide](/blog/numa-allocators-beginner/):
 
 ```rust
 pub fn validate_benchmark_environment() -> EnvironmentReport {

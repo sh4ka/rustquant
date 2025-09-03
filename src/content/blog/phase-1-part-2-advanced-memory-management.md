@@ -7,7 +7,7 @@ difficulty: "advanced"
 concepts: ["Memory Management", "Lock-free Programming", "NUMA Optimization", "Cache Optimization"]
 tags: ["rust", "hft", "memory", "lock-free", "numa", "performance"]
 prerequisites: ["phase-1-foundations-of-hft-with-rust"]
-relatedArticles: ["0-initial-plan", "1-project-roadmap"]
+relatedArticles: ["0-initial-plan", "1-project-roadmap", "numa-allocators-beginner"]
 seriesOrder: 4
 ---
 
@@ -19,7 +19,7 @@ Standard allocators are designed for general-purpose workloads and introduce unp
 
 ### NUMA-aware arena allocator
 
-Modern servers use NUMA (Non-Uniform Memory Access) architectures where memory access costs depend on CPU socket placement. Our allocator ensures memory locality:
+Modern servers use NUMA (Non-Uniform Memory Access) architectures where memory access costs depend on CPU socket placement. For an introduction to NUMA concepts, see our [beginner's guide to NUMA allocators](/blog/numa-allocators-beginner/). Our allocator ensures memory locality:
 
 ```rust
 // crates/hft-core/src/allocator/numa.rs

@@ -4,7 +4,7 @@ description: "A high‑level overview of the architecture and core components of
 pubDate: "Jul 31 2025"
 mindmapBranch: "Components"
 concepts: ["Order Management"]
-relatedArticles: ["limit-order-book", "advanced-order-types-and-persistence"]
+relatedArticles: ["limit-order-book", "advanced-order-types-and-persistence", "numa-allocators-beginner"]
 prerequisites: ["phase-1-foundations-of-hft-with-rust"]
 difficulty: "intermediate"
 tags: ["rust", "hft", "order-book", "architecture", "matching-engine"]
@@ -42,7 +42,7 @@ A limit order book maintains two opposing queues—bids (buy orders) and asks (s
 
 ## Design considerations
 
-* **Performance**: prefer contiguous memory layouts (for example arrays or intrusive lists) and minimize dynamic allocations
+* **Performance**: prefer contiguous memory layouts (for example arrays or intrusive lists) and minimize dynamic allocations. For memory optimization strategies, see our [NUMA allocators guide](/blog/numa-allocators-beginner/)
 * **Latency**: use lock free or single threaded designs and write branch predictable code in hot paths
 * **Consistency**: guarantee deterministic processing to support reliable replay and testing
 * **Scalability**: support multiple instruments via sharded books or partitioned threads
